@@ -1,10 +1,16 @@
 # Setup
 title: George Ho
-tagline: Problem Solver
-url: https://getpoole.com
-paginate: 1
+tagline: "Problem Solver"
+url: https://georgehwho.github.io
+# paginate: 1
 baseurl: ""
 permalink: pretty
+
+# pages in nav bar
+include: ['_pages']
+pages_list:
+  About: '/about'
+  Archive: '/archive'
 
 # Gems
 plugins:
