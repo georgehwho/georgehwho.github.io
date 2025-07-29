@@ -1,19 +1,60 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './PDFViewer.css';
 
 const PDFViewer = () => {
   const [selectedPDF, setSelectedPDF] = useState(null);
+  const [pdfs, setPdfs] = useState([]);
 
-  const pdfs = [
-    {
-      name: "Intermediate High Unit Two",
-      filename: "Intermediate+High+Unit+Two-__.pdf"
-    },
-    {
-      name: "Potter's Oracle (Kerkeslager 1998)",
-      filename: "Potter's Oracle (Kerkeslager 1998).pdf"
-    }
-  ];
+  useEffect(() => {
+    const loadPDFs = async () => {
+      try {
+        const response = await fetch(`${process.env.PUBLIC_URL}/pdfs/`);
+        if (response.ok) {
+          const html = await response.text();
+          const parser = new DOMParser();
+          const doc = parser.parseFromString(html, 'text/html');
+          const links = Array.from(doc.querySelectorAll('a[href$=".pdf"]'));
+          
+          const pdfObjects = links.map(link => {
+            const filename = link.getAttribute('href');
+            return {
+              name: decodeURIComponent(filename).replace(/\+/g, ' ').replace('.pdf', ''),
+              filename: filename
+            };
+          });
+          
+          setPdfs(pdfObjects);
+        } else {
+          const fallbackPdfs = [
+            "Intermediate+High+Unit+Two-__.pdf",
+            "Potter's Oracle (Kerkeslager 1998).pdf", 
+            "math_test.pdf",
+            "old inferno final.pdf"
+          ].map(filename => ({
+            name: filename.replace(/\+/g, ' ').replace('.pdf', ''),
+            filename: filename
+          }));
+          
+          setPdfs(fallbackPdfs);
+        }
+      } catch (error) {
+        console.error('Error loading PDFs:', error);
+        const fallbackPdfs = [
+          "Intermediate+High+Unit+Two-__.pdf",
+          "Potter's Oracle (Kerkeslager 1998).pdf",
+          "math_test.pdf", 
+          "old inferno final.pdf"
+        ].map(filename => ({
+          name: filename.replace(/\+/g, ' ').replace('.pdf', ''),
+          filename: filename
+        }));
+        
+        setPdfs(fallbackPdfs);
+      }
+    };
+
+    loadPDFs();
+  }, []);
 
   const openPDF = (filename) => {
     setSelectedPDF(filename);
