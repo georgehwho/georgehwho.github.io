@@ -6,54 +6,27 @@ const PDFViewer = () => {
   const [pdfs, setPdfs] = useState([]);
 
   useEffect(() => {
-    const loadPDFs = async () => {
-      try {
-        const response = await fetch(`${process.env.PUBLIC_URL}/pdfs/`);
-        if (response.ok) {
-          const html = await response.text();
-          const parser = new DOMParser();
-          const doc = parser.parseFromString(html, 'text/html');
-          const links = Array.from(doc.querySelectorAll('a[href$=".pdf"]'));
-          
-          const pdfObjects = links.map(link => {
-            const filename = link.getAttribute('href');
-            return {
-              name: decodeURIComponent(filename).replace(/\+/g, ' ').replace('.pdf', ''),
-              filename: filename
-            };
-          });
-          
-          setPdfs(pdfObjects);
-        } else {
-          const fallbackPdfs = [
-            "Intermediate+High+Unit+Two-__.pdf",
-            "Potter's Oracle (Kerkeslager 1998).pdf", 
-            "math_test.pdf",
-            "old inferno final.pdf"
-          ].map(filename => ({
-            name: filename.replace(/\+/g, ' ').replace('.pdf', ''),
-            filename: filename
-          }));
-          
-          setPdfs(fallbackPdfs);
-        }
-      } catch (error) {
-        console.error('Error loading PDFs:', error);
-        const fallbackPdfs = [
-          "Intermediate+High+Unit+Two-__.pdf",
-          "Potter's Oracle (Kerkeslager 1998).pdf",
-          "math_test.pdf", 
-          "old inferno final.pdf"
-        ].map(filename => ({
-          name: filename.replace(/\+/g, ' ').replace('.pdf', ''),
-          filename: filename
-        }));
-        
-        setPdfs(fallbackPdfs);
+    // Define the PDFs that exist in the public/pdfs folder
+    const availablePdfs = [
+      {
+        name: "Intermediate High Unit Two",
+        filename: "Intermediate+High+Unit+Two-__.pdf"
+      },
+      {
+        name: "Potter's Oracle (Kerkeslager 1998)",
+        filename: "Potter's Oracle (Kerkeslager 1998).pdf"
+      },
+      {
+        name: "Math Test",
+        filename: "math_test.pdf"
+      },
+      {
+        name: "Old Inferno Final",
+        filename: "old inferno final.pdf"
       }
-    };
-
-    loadPDFs();
+    ];
+    
+    setPdfs(availablePdfs);
   }, []);
 
   const openPDF = (filename) => {
@@ -89,7 +62,7 @@ const PDFViewer = () => {
           </div>
           <div className="pdf-container">
             <iframe
-              src={`${process.env.PUBLIC_URL}/pdfs/${selectedPDF}`}
+              src={`${process.env.PUBLIC_URL}/pdfs/${encodeURIComponent(selectedPDF)}`}
               width="100%"
               height="800px"
               title="PDF Viewer"
